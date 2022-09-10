@@ -1,0 +1,27 @@
+#!/bin/sh
+declare -a options=(
+  "Choose a config file:"
+  ""
+  "$HOME/.local/src/suckless/dwm-6.3/config.def.h"
+  "$HOME/.local/src/suckless/dmenu/config.def.h"
+  "$HOME/.local/src/suckless/st/config.def.h"
+  "$HOME/.local/src/suckless/dwmblocks/config.def.h"
+  "$HOME/.config/shell/aliasrc"
+  "$HOME/.config/shell/profile"
+  "$HOME/.config/zsh/.zshrc"
+  "$HOME/.config/newsboat/urls"
+  "$HOME/.local/bin/configs"
+  "$HOME/.local/bin/shooter"
+  "$HOME/.local/bin/setbg"
+  "$HOME/.local/bin/updatr"
+  "$HOME/.local/bin/manr"
+  "$HOME/.local/bin/dmenuemoji"
+  "$HOME/.local/bin/powermenu"
+  ""
+)
+choice=$(printf '%s\n' "${options[@]}" | dmenu -l 20 -p configs)
+if [[ $choice == *"$HOME"* ]]; then
+  cpath=$(echo $choice | grep -o '/' | wc -l)
+  cpath=$(echo $choice | cut -d'/' -f -$cpath)
+  $TERMINAL -d $cpath -e $EDITOR $choice 
+fi

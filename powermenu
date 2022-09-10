@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# A dmenu wrapper script for system functions.
+export WM="dwm"
+case "$(readlink -f /sbin/init)" in
+	*systemd*) ctl='systemctl' ;;
+	*) ctl='loginctl' ;;
+esac
+
+case "$(echo -e "choose a power option:\n\n🔐 lock\n🔌 shutdown\n🔁 reboot\n💤 sleep\n" | dmenu -l 20 -p 'powr')" in
+	'🔐 lock') slock ;;
+        '🔌 shutdown') $ctl poweroff -i ;;
+      	'🔁 reboot') $ctl reboot -i ;;
+        '💤 sleep') slock $ctl suspend -i ;;
+	*) exit 1 ;;
+esac

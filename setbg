@@ -1,0 +1,62 @@
+#!/bin/sh
+
+# sets your wallpaper
+# Requires: nsxiv, xwallpaper, libnotify, imagemagick
+
+restorepath="$HOME/.config/wall.png"
+walllocation="$HOME/wallpapers/"
+helpmsg="Usage: setbg [OPTION] [FILE]\n\n
+        
+        -r,     restores image from $restorepath\n
+        -a,     set a random image from $walllocation\n
+        -s,     set an image of choice\n
+        -w,     set an image of choice from the internet (will convert webps if imagemagick is installed)\n
+        -h, --help shows help page\n\n
+        
+        Running without any flags will allow you to select from all wallpapers in $walllocation via nsxiv"
+if [ $1 ]; then
+  case $1 in
+    "-r")
+      notify-send -i $restorepath "Restoring Wallpaper..." $restorepath &
+      xwallpaper --zoom $restorepath
+    ;;
+    "-a")
+      if [ $2 ]; then
+        wallchoice=$(find $2 -type f | shuf | head -1 )
+      else
+        wallchoice=$(find $walllocation -type f | shuf | head -1 )
+      fi
+      notify-send -i $wallchoice "Setting Random Wallpaper..." $wallchoice &
+      xwallpaper --zoom $wallchoice
+      cp -f $wallchoice $restorepath
+    ;;
+    "-s")
+      wallchoice=$(pwd)/$2
+      notify-send -i $wallchoice "Setting Wallpaper..." $wallchoice &
+      xwallpaper --zoom $wallchoice
+      cp -f $wallchoice $restorepath
+    ;;
+    "-w")
+      wallchoice=$2
+      if [[ "$wallchoice" == "https"* ]]; then
+        wget -O ~/.config/wall.png $wallchoice
+        if [[ "$wallchoice" == *"webp"* ]]; then
+          magick $restorepath $restorepath
+        fi
+        notify-send -i $restorepath "Setting Wallpaper..." $wallchoice &
+        xwallpaper --zoom $restorepath
+      else
+        setbg -h
+      fi
+      ;;
+    "-h")
+      echo -e $helpmsg ;;
+    "--help")
+      echo -e $helpmsg ;;
+  esac
+else
+  wallchoice=$(find $walllocation -type f | shuf | nsxiv -to - )
+  notify-send -i $wallchoice "Setting Wallpaper..." $wallchoice & 
+  xwallpaper --zoom $wallchoice
+  cp -f $wallchoice $restorepath 
+fi

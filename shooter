@@ -1,0 +1,18 @@
+#!/bin/sh
+outputStyle=$HOME/Pictures/screenshots/"$(date '+%F-%T').png"
+case "$(echo -e "screenshot with maim\n\n📸 active window\n📐 area select\n📖 all screens\n" | dmenu -l 20 -p shooter)" in
+    "📸 active window") 
+          maim -uf png -i "$(xdotool getactivewindow)" $outputStyle 
+          notify-send -i $outputStyle "Saved as:" $outputStyle
+        ;;
+    "📐 area select") 
+          maim -usof png $outputStyle
+          if [ $(ls $outputStyle) ]; then
+            notify-send -i $outputStyle "Saved as:" $outputStyle
+          fi
+        ;;
+    "📖 all screens") 
+          maim -uf png $outputStyle 
+          notify-send -i $outputStyle "Saved as:" $outputStyle
+        ;;
+esac
